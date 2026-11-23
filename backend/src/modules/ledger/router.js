@@ -1,31 +1,31 @@
 /**
- * ledger/router.js
- * Handles: signing_keys, ledger_events, ledger_batches
+ * ledger/router.js — paths relative to /api/v1
  */
-'use strict';
-
-const { Router } = require('express');
-const { requireAuth } = require('../../middlewares/auth');
-const { requireRole } = require('../../middlewares/rbac');
-const { attachTenantClient } = require('../../middlewares/tenantScope');
+import { Router } from 'express';
+import { requireAuth } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/rbac.js';
+import { tenantScope } from '../../middlewares/tenantScope.js';
+import * as ctrl from './controller.js';
 
 const router = Router();
+const auth = [requireAuth, tenantScope];
+const adminOnly = [...auth, requireRole('ORG_ADMIN')];
+const auditorOk = [...auth, requireRole('ORG_ADMIN', 'AUDITOR')];
 
-// --- Ledger Events (read-only; immutable via ER-06) ---
-// GET    /api/v1/ledger/events
-// GET    /api/v1/ledger/events/:id
-// GET    /api/v1/ledger/events/:id/verify   (re-verify signature)
+// Signing keys
+router.get('/ledger/keys', ...adminOnly, ctrl.listSigningKeys);
+router.post('/ledger/keys', ...adminOnly, ctrl.createSigningKey);
+router.patch('/ledger/keys/:keyId/revoke', ...adminOnly, ctrl.revokeSigningKey);
 
-// --- Ledger Batches ---
-// GET    /api/v1/ledger/batches
-// POST   /api/v1/ledger/batches             (org_admin — seal pending events into Merkle batch)
-// GET    /api/v1/ledger/batches/:id
-// GET    /api/v1/ledger/batches/:id/proof   (Merkle inclusion proof for a given event)
+// Ledger events
+router.get('/ledger/events', ...auditorOk, ctrl.listLedgerEvents);
+router.get('/ledger/events/:id', ...auditorOk, ctrl.getLedgerEvent);
 
-// --- Signing Keys ---
-// GET    /api/v1/ledger/keys                (super_admin only)
-// POST   /api/v1/ledger/keys/rotate         (rotate active signing key)
+// Chain verification (ER-07)
+router.get('/ledger/verify-chain', ...auditorOk, ctrl.verifyChain);
 
-router.get('/health', (_req, res) => res.json({ module: 'ledger', status: 'ok' }));
+// Ledger batches
+router.get('/ledger/batches', ...auditorOk, ctrl.listBatches);
+router.post('/ledger/batches', ...adminOnly, ctrl.createBatch);
 
-module.exports = router;
+export default router;

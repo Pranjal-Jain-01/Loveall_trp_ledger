@@ -1,37 +1,36 @@
 /**
- * compliance/router.js
- * Handles: funding_agreements, disbursements, compliance_rules, compliance_checks
+ * compliance/router.js — paths relative to /api/v1
  */
-'use strict';
-
-const { Router } = require('express');
-const { requireAuth } = require('../../middlewares/auth');
-const { requireRole } = require('../../middlewares/rbac');
-const { attachTenantClient } = require('../../middlewares/tenantScope');
+import { Router } from 'express';
+import { requireAuth } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/rbac.js';
+import { tenantScope } from '../../middlewares/tenantScope.js';
+import * as ctrl from './controller.js';
 
 const router = Router();
+const auth = [requireAuth, tenantScope];
+const financeOnly = [...auth, requireRole('ORG_ADMIN', 'FINANCE_OFFICER')];
+const adminOnly = [...auth, requireRole('ORG_ADMIN')];
 
-// --- Funding Agreements ---
-// GET    /api/v1/compliance/agreements
-// POST   /api/v1/compliance/agreements
-// GET    /api/v1/compliance/agreements/:id
-// PATCH  /api/v1/compliance/agreements/:id
+// Funding agreements
+router.get('/agreements', ...auth, ctrl.listAgreements);
+router.post('/agreements', ...financeOnly, ctrl.createAgreement);
+router.get('/agreements/:id', ...auth, ctrl.getAgreement);
+router.patch('/agreements/:id/verify', ...adminOnly, ctrl.verifyAgreement);
 
-// --- Disbursements ---
-// GET    /api/v1/compliance/disbursements
-// POST   /api/v1/compliance/disbursements    (ER-03 budget check enforced)
-// GET    /api/v1/compliance/disbursements/:id
-// PATCH  /api/v1/compliance/disbursements/:id/status
+// Compliance rules (platform-global — read by any authenticated; write by ORG_ADMIN)
+router.get('/compliance-rules', requireAuth, ctrl.listComplianceRules);
+router.post('/compliance-rules', requireAuth, requireRole('ORG_ADMIN'), ctrl.createComplianceRule);
 
-// --- Compliance Rules ---
-// GET    /api/v1/compliance/rules
-// POST   /api/v1/compliance/rules
-// DELETE /api/v1/compliance/rules/:id
+// Disbursements (ER-02, ER-03 enforced by DB triggers on INSERT)
+router.get('/disbursements', ...auth, ctrl.listDisbursements);
+router.post('/disbursements', ...financeOnly, ctrl.createDisbursement);
+router.get('/disbursements/:id', ...auth, ctrl.getDisbursement);
+router.post('/disbursements/:id/submit', ...financeOnly, ctrl.submitDisbursement);
+router.post('/disbursements/:id/approve', ...adminOnly, ctrl.approveDisbursement);
+router.post('/disbursements/:id/pay', ...financeOnly, ctrl.payDisbursement);
 
-// --- Compliance Checks ---
-// GET    /api/v1/compliance/checks
-// POST   /api/v1/compliance/checks/run      (run all rules against a disbursement)
+// Compliance evaluation
+router.post('/compliance-checks/run', ...adminOnly, ctrl.evaluateCompliance);
 
-router.get('/health', (_req, res) => res.json({ module: 'compliance', status: 'ok' }));
-
-module.exports = router;
+export default router;

@@ -1,63 +1,26 @@
-/**
- * rbac.js — Role-Based Access Control middleware
- *
- * Roles (from low → high privilege):
- *   field_worker < supervisor < finance_officer < org_admin
- *   verifier (independent, cross-org read)
- *   super_admin (platform level)
- *   public (unauthenticated)
- */
-'use strict';
-
-const ROLE_HIERARCHY = {
-  field_worker: 1,
-  supervisor: 2,
-  finance_officer: 3,
-  org_admin: 4,
-  verifier: 2.5,  // Cross-org read access, sits between supervisor & finance_officer
-  super_admin: 99,
+export const ROLES = {
+  ORG_ADMIN: 'ORG_ADMIN',
+  FINANCE_OFFICER: 'FINANCE_OFFICER',
+  FIELD_WORKER: 'FIELD_WORKER',
+  SUPERVISOR: 'SUPERVISOR',
+  INDEPENDENT_VERIFIER: 'INDEPENDENT_VERIFIER',
+  AUDITOR: 'AUDITOR',
 };
 
 /**
  * requireRole(...roles) — middleware factory.
- * Accepts if req.user.role matches ANY of the specified roles.
- *
- * @param {...string} roles
+ * Returns 403 if req.orgContext.role is not in the allowed list.
  */
-function requireRole(...roles) {
+export function requireRole(...roles) {
   return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required.' });
+    if (!req.orgContext) {
+      return res.status(403).json({ error: 'Organisation context required.' });
     }
-    if (!roles.includes(req.user.role) && req.user.role !== 'super_admin') {
+    if (!roles.includes(req.orgContext.role)) {
       return res.status(403).json({
-        error: 'Insufficient permissions.',
-        required: roles,
-        actual: req.user.role,
+        error: `Role '${req.orgContext.role}' is not permitted for this action. Required: ${roles.join(', ')}.`,
       });
     }
     next();
   };
 }
-
-/**
- * requireMinRole(minRole) — middleware factory.
- * Accepts if req.user.role is at or above minRole in the hierarchy.
- *
- * @param {string} minRole
- */
-function requireMinRole(minRole) {
-  const minLevel = ROLE_HIERARCHY[minRole] ?? 0;
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required.' });
-    }
-    const userLevel = ROLE_HIERARCHY[req.user.role] ?? 0;
-    if (userLevel < minLevel && req.user.role !== 'super_admin') {
-      return res.status(403).json({ error: 'Insufficient role level.' });
-    }
-    next();
-  };
-}
-
-module.exports = { requireRole, requireMinRole, ROLE_HIERARCHY };

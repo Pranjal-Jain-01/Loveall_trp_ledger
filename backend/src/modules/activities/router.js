@@ -1,36 +1,34 @@
 /**
- * activities/router.js
- * Handles: activity_events, evidence_files, attestations, activity_disputes
+ * activities/router.js — paths relative to /api/v1
  */
-'use strict';
-
-const { Router } = require('express');
-const { requireAuth } = require('../../middlewares/auth');
-const { requireRole } = require('../../middlewares/rbac');
-const { attachTenantClient } = require('../../middlewares/tenantScope');
+import { Router } from 'express';
+import { requireAuth } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/rbac.js';
+import { tenantScope } from '../../middlewares/tenantScope.js';
+import * as ctrl from './controller.js';
 
 const router = Router();
+const auth = [requireAuth, tenantScope];
+const fieldWorker = [...auth, requireRole('ORG_ADMIN', 'FINANCE_OFFICER', 'FIELD_WORKER', 'SUPERVISOR', 'INDEPENDENT_VERIFIER')];
+const verifierOnly = [...auth, requireRole('ORG_ADMIN', 'SUPERVISOR', 'INDEPENDENT_VERIFIER')];
+const scanAdmin = [...auth, requireRole('ORG_ADMIN', 'SUPERVISOR')];
 
-// --- Activity Events ---
-// GET    /api/v1/activities
-// POST   /api/v1/activities                (field_worker report)
-// GET    /api/v1/activities/:id
-// PATCH  /api/v1/activities/:id            (locked when dispute open — ER-09)
+// Activities
+router.get('/activities', ...auth, ctrl.listActivities);
+router.post('/activities', ...fieldWorker, ctrl.createActivity);
+router.get('/activities/:id', ...auth, ctrl.getActivity);
 
-// --- Evidence Files ---
-// POST   /api/v1/activities/:id/evidence   (multipart upload)
-// GET    /api/v1/activities/:id/evidence
-// GET    /api/v1/activities/:id/evidence/:fileId/url   (presigned URL)
+// Evidence files
+router.get('/activities/:id/evidence', ...auth, ctrl.listEvidence);
+router.post('/activities/:id/evidence', ...fieldWorker, ctrl.addEvidence);
+router.patch('/activities/:id/evidence/:evidenceId/scan', ...scanAdmin, ctrl.updateEvidenceScan);
 
-// --- Attestations ---
-// POST   /api/v1/activities/:id/attest     (ER-04 chain enforced)
-// GET    /api/v1/activities/:id/attestations
+// Attestations (ER-05, ER-06)
+router.get('/activities/:id/attestations', ...auth, ctrl.listAttestations);
+router.post('/activities/:id/attestations', ...verifierOnly, ctrl.createAttestation);
 
-// --- Disputes ---
-// POST   /api/v1/activities/:id/dispute
-// GET    /api/v1/activities/:id/dispute
-// PATCH  /api/v1/activities/:id/dispute/resolve
+// Disputes
+router.post('/activities/:id/disputes', ...auth, ctrl.createDispute);
+router.patch('/activities/:id/disputes/:disputeId/resolve', ...verifierOnly, ctrl.resolveDispute);
 
-router.get('/health', (_req, res) => res.json({ module: 'activities', status: 'ok' }));
-
-module.exports = router;
+export default router;

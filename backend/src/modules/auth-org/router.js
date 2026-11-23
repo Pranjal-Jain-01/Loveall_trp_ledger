@@ -1,29 +1,33 @@
 /**
- * auth-org/router.js
- * Handles: organisations, users, memberships, registrations
+ * auth-org/router.js — paths relative to /api/v1
  */
-'use strict';
-
-const { Router } = require('express');
-const { requireAuth } = require('../../middlewares/auth');
-const { requireRole } = require('../../middlewares/rbac');
-const { attachTenantClient } = require('../../middlewares/tenantScope');
+import { Router } from 'express';
+import { requireAuth } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/rbac.js';
+import { tenantScope } from '../../middlewares/tenantScope.js';
+import * as ctrl from './controller.js';
 
 const router = Router();
 
-// POST   /api/v1/auth/register          — Register a new organisation
-// POST   /api/v1/auth/login             — Exchange credentials for JWT
-// POST   /api/v1/auth/refresh           — Refresh access token
-// POST   /api/v1/auth/logout            — Invalidate refresh token
-// GET    /api/v1/auth/me                — Current user profile
-// PATCH  /api/v1/auth/me                — Update profile
-// GET    /api/v1/auth/users             — List org members (org_admin)
-// POST   /api/v1/auth/users/invite      — Invite user to org
-// PATCH  /api/v1/auth/users/:userId/role — Change member role
-// DELETE /api/v1/auth/users/:userId     — Remove member
+// Public auth
+router.post('/auth/register', ctrl.register);
+router.post('/auth/login', ctrl.login);
 
-router.get('/health', (_req, res) => res.json({ module: 'auth-org', status: 'ok' }));
+// Authenticated user profile
+router.get('/auth/me', requireAuth, ctrl.getMe);
 
-// TODO: implement handlers in ./controllers.js
+// Organisations
+router.post('/organisations', requireAuth, ctrl.createOrganisation);
+router.get('/organisations/current', requireAuth, tenantScope, ctrl.getOrganisation);
 
-module.exports = router;
+// Membership management (ORG_ADMIN only)
+router.get('/organisations/current/members', requireAuth, tenantScope, requireRole('ORG_ADMIN'), ctrl.getMemberships);
+router.post('/organisations/current/members', requireAuth, tenantScope, requireRole('ORG_ADMIN'), ctrl.addMembership);
+router.delete('/organisations/current/members/:userId', requireAuth, tenantScope, requireRole('ORG_ADMIN'), ctrl.deactivateMembership);
+
+// Statutory registrations
+router.post('/organisations/current/registrations', requireAuth, tenantScope, requireRole('ORG_ADMIN'), ctrl.createRegistration);
+router.get('/organisations/current/registrations', requireAuth, tenantScope, ctrl.getRegistrations);
+router.patch('/organisations/current/registrations/:regId/verify', requireAuth, tenantScope, requireRole('ORG_ADMIN', 'AUDITOR'), ctrl.verifyRegistration);
+
+export default router;

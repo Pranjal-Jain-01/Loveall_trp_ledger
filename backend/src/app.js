@@ -1,76 +1,66 @@
 /**
- * app.js — Express application factory
- *
- * Sets up all global middleware, mounts module routers,
- * and registers the error handler.
+ * app.js — Rewritten to mount all routers at /api/v1 with flat routing.
+ * Each module router defines its own full sub-paths relative to /api/v1.
  */
-'use strict';
+import 'dotenv/config';
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
 
-require('dotenv').config();
+import { auditMiddleware } from './middlewares/auditLogger.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
-const express = require('express');
-const helmet = require('helmet');
-const cors = require('cors');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-
-const { auditLog } = require('./middlewares/auditLogger');
-const { errorHandler } = require('./middlewares/errorHandler');
-
-// Module routers
-const authOrgRouter = require('./modules/auth-org/router');
-const contributionsRouter = require('./modules/contributions/router');
-const accountingRouter = require('./modules/accounting/router');
-const complianceRouter = require('./modules/compliance/router');
-const activitiesRouter = require('./modules/activities/router');
-const ledgerRouter = require('./modules/ledger/router');
-const publicReceiptsRouter = require('./modules/public-receipts/router');
-const privacyAuditRouter = require('./modules/privacy-audit/router');
+import authOrgRouter from './modules/auth-org/router.js';
+import contributionsRouter from './modules/contributions/router.js';
+import accountingRouter from './modules/accounting/router.js';
+import complianceRouter from './modules/compliance/router.js';
+import activitiesRouter from './modules/activities/router.js';
+import ledgerRouter from './modules/ledger/router.js';
+import publicReceiptsRouter from './modules/public-receipts/router.js';
+import privacyAuditRouter from './modules/privacy-audit/router.js';
 
 const app = express();
 
-// ── Security middlewares ──────────────────────────────────────────────────────
+// Security
 app.use(helmet());
-app.use(
-  cors({
-    origin: (process.env.ALLOWED_ORIGINS ?? '').split(',').map((o) => o.trim()),
-    credentials: true,
-  }),
-);
-app.use(
-  rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? '900000', 10),
-    max: parseInt(process.env.RATE_LIMIT_MAX ?? '200', 10),
-    standardHeaders: true,
-    legacyHeaders: false,
-  }),
-);
+app.use(cors({
+  origin: (process.env.ALLOWED_ORIGINS ?? '').split(',').map(o => o.trim()).filter(Boolean),
+  credentials: true,
+}));
+app.use(rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? '900000', 10),
+  max: parseInt(process.env.RATE_LIMIT_MAX ?? '300', 10),
+  standardHeaders: true,
+  legacyHeaders: false,
+}));
 
-// ── Parsing & logging ─────────────────────────────────────────────────────────
+// Parsing & logging
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'));
-app.use(auditLog);
+app.use(auditMiddleware);
 
-// ── Health check ──────────────────────────────────────────────────────────────
+// Health
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
 
-// ── API routes ────────────────────────────────────────────────────────────────
-const API = `/api/${process.env.API_VERSION ?? 'v1'}`;
+// API v1 — all module routers mounted at /api/v1
+// Each router defines its own full sub-paths (e.g., router.get('/contributions', ...))
+const API = '/api/v1';
+app.use(API, authOrgRouter);
+app.use(API, contributionsRouter);
+app.use(API, accountingRouter);
+app.use(API, complianceRouter);
+app.use(API, activitiesRouter);
+app.use(API, ledgerRouter);
+app.use(API, publicReceiptsRouter);
+app.use(API, privacyAuditRouter);
 
-app.use(`${API}/auth`, authOrgRouter);
-app.use(`${API}/contributions`, contributionsRouter);
-app.use(`${API}/accounting`, accountingRouter);
-app.use(`${API}/compliance`, complianceRouter);
-app.use(`${API}/activities`, activitiesRouter);
-app.use(`${API}/ledger`, ledgerRouter);
-app.use(`${API}/receipts`, publicReceiptsRouter);
-app.use(`${API}/privacy`, privacyAuditRouter);
-
-// ── 404 handler ───────────────────────────────────────────────────────────────
+// 404
 app.use((_req, res) => res.status(404).json({ error: 'Not found.' }));
 
-// ── Centralised error handler (must be last) ──────────────────────────────────
+// Error handler (last)
 app.use(errorHandler);
 
-module.exports = app;
+export default app;

@@ -1,32 +1,26 @@
 /**
- * accounting/router.js
- * Handles: chart_of_accounts, journal_entries, journal_lines
+ * accounting/router.js — paths relative to /api/v1
  */
-'use strict';
-
-const { Router } = require('express');
-const { requireAuth } = require('../../middlewares/auth');
-const { requireRole } = require('../../middlewares/rbac');
-const { attachTenantClient } = require('../../middlewares/tenantScope');
+import { Router } from 'express';
+import { requireAuth } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/rbac.js';
+import { tenantScope } from '../../middlewares/tenantScope.js';
+import * as ctrl from './controller.js';
 
 const router = Router();
+const auth = [requireAuth, tenantScope];
+const financeOnly = [...auth, requireRole('ORG_ADMIN', 'FINANCE_OFFICER')];
 
-// --- Chart of Accounts ---
-// GET    /api/v1/accounting/accounts
-// POST   /api/v1/accounting/accounts
-// GET    /api/v1/accounting/accounts/:id
-// PATCH  /api/v1/accounting/accounts/:id
+// Chart of accounts
+router.get('/accounts', ...auth, ctrl.listAccounts);
+router.post('/accounts', ...financeOnly, ctrl.createAccount);
+router.get('/accounts/:id', ...auth, ctrl.getAccount);
 
-// --- Journal Entries ---
-// GET    /api/v1/accounting/journals
-// POST   /api/v1/accounting/journals       (creates entry + lines atomically; ER-01 enforced)
-// GET    /api/v1/accounting/journals/:id
-// POST   /api/v1/accounting/journals/:id/post
-// POST   /api/v1/accounting/journals/:id/void
+// Journal entries (ER-08)
+router.get('/journal-entries', ...auth, ctrl.listJournalEntries);
+router.post('/journal-entries', ...financeOnly, ctrl.createJournalEntry);
+router.get('/journal-entries/:id', ...auth, ctrl.getJournalEntry);
+router.post('/journal-entries/:id/post', ...financeOnly, ctrl.postJournalEntry);
+router.post('/journal-entries/:id/reverse', ...financeOnly, ctrl.reverseJournalEntry);
 
-// --- Trial Balance (read-only report)
-// GET    /api/v1/accounting/trial-balance
-
-router.get('/health', (_req, res) => res.json({ module: 'accounting', status: 'ok' }));
-
-module.exports = router;
+export default router;
