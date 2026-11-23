@@ -1,68 +1,122 @@
-/**
- * App.tsx — Portal-based routing
- *
- * Routes are grouped by portal. The active portal is determined by
- * VITE_PORTAL_MODE env var (useful for multi-domain deployments)
- * or by URL prefix in single-domain mode.
- */
-
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-// Portal index pages (lazy-loaded)
-import AdminPortal from './portals/admin/index';
-import FieldPwaPortal from './portals/field-pwa/index';
-import VerifierPortal from './portals/verifier/index';
-import PublicPortal from './portals/public/index';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 2,
-    },
-  },
-});
-
-const PORTAL_MODE = import.meta.env.VITE_PORTAL_MODE ?? 'admin';
+import { useState } from 'react'
+import heroImg from './assets/hero.png'
+import reactLogo from './assets/react.svg'
+import viteLogo from './assets/vite.svg'
+import './App.css'
 
 function App() {
+  const [count, setCount] = useState(0)
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          {/* Admin & Finance Officer portal */}
-          <Route path="/admin/*" element={<AdminPortal />} />
+    <>
+      <section id="center">
+        <div className="hero">
+          <img src={heroImg} className="base" width="170" height="179" alt="" />
+          <img src={reactLogo} className="framework" alt="React logo" />
+          <img src={viteLogo} className="vite" alt="Vite logo" />
+        </div>
+        <div>
+          <h1>Get started</h1>
+          <p>
+            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+          </p>
+        </div>
+        <button
+          type="button"
+          className="counter"
+          onClick={() => setCount((count) => count + 1)}
+        >
+          Count is {count}
+        </button>
+      </section>
 
-          {/* Field Worker mobile PWA */}
-          <Route path="/field/*" element={<FieldPwaPortal />} />
+      <div className="ticks"></div>
 
-          {/* Supervisor & Independent Verifier */}
-          <Route path="/verify/*" element={<VerifierPortal />} />
+      <section id="next-steps">
+        <div id="docs">
+          <svg className="icon" role="presentation" aria-hidden="true">
+            <use href="/icons.svg#documentation-icon"></use>
+          </svg>
+          <h2>Documentation</h2>
+          <p>Your questions, answered</p>
+          <ul>
+            <li>
+              <a href="https://vite.dev/" target="_blank">
+                <img className="logo" src={viteLogo} alt="" />
+                Explore Vite
+              </a>
+            </li>
+            <li>
+              <a href="https://react.dev/" target="_blank">
+                <img className="button-icon" src={reactLogo} alt="" />
+                Learn more
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div id="social">
+          <svg className="icon" role="presentation" aria-hidden="true">
+            <use href="/icons.svg#social-icon"></use>
+          </svg>
+          <h2>Connect with us</h2>
+          <p>Join the Vite community</p>
+          <ul>
+            <li>
+              <a href="https://github.com/vitejs/vite" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#github-icon"></use>
+                </svg>
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://chat.vite.dev/" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#discord-icon"></use>
+                </svg>
+                Discord
+              </a>
+            </li>
+            <li>
+              <a href="https://x.com/vite_js" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#x-icon"></use>
+                </svg>
+                X.com
+              </a>
+            </li>
+            <li>
+              <a href="https://bsky.app/profile/vite.dev" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#bluesky-icon"></use>
+                </svg>
+                Bluesky
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
 
-          {/* Public donor dashboard & receipt verifier */}
-          <Route path="/public/*" element={<PublicPortal />} />
-          <Route path="/r/:token" element={<PublicPortal />} />
-
-          {/* Root redirect based on portal mode */}
-          <Route
-            path="/"
-            element={
-              <Navigate
-                to={
-                  PORTAL_MODE === 'admin' ? '/admin'
-                  : PORTAL_MODE === 'field-pwa' ? '/field'
-                  : PORTAL_MODE === 'verifier' ? '/verify'
-                  : '/public'
-                }
-                replace
-              />
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
+      <div className="ticks"></div>
+      <section id="spacer"></section>
+    </>
+  )
 }
 
-export default App;
+export default App
