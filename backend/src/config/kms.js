@@ -1,33 +1,33 @@
 /**
- * kms.js — Key Management Service abstraction stub
+ * kms.js — Key Management Service abstraction stub (ESM)
  *
- * Provides signing (Ed25519 / RSA-PSS) and encryption primitives
- * backed by either a local file-based key store (dev) or a cloud KMS.
+ * Provides signing (Ed25519 / RSA-PSS) and verification primitives.
+ * In production, replace 'local' provider with AWS KMS or GCP KMS.
+ *
+ * NOTE: The ledger engine (ledgerTransaction.js) handles Ed25519 signing directly
+ * via Node crypto, using the private key PEM from env vars. This module is a
+ * higher-level abstraction stub for future cloud KMS integration.
  */
-'use strict';
-
-const { createSign, createVerify, createHmac, randomBytes } = require('crypto');
-const fs = require('fs/promises');
-const path = require('path');
+import { createSign, createVerify, createHmac } from 'crypto';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 const PROVIDER = process.env.KMS_PROVIDER ?? 'local';
 const LOCAL_KEY_PATH = process.env.SIGNING_KEY_LOCAL_PATH ?? './keys';
 
 /**
  * Signs arbitrary data with the active signing key.
- *
  * @param {string | Buffer} data
  * @param {string} [algorithm='RSA-SHA256']
  * @returns {Promise<{ signature: string, keyId: string, algorithm: string }>}
  */
-async function sign(data, algorithm = 'RSA-SHA256') {
+export async function sign(data, algorithm = 'RSA-SHA256') {
   if (PROVIDER === 'local') {
-    const keyPath = path.join(LOCAL_KEY_PATH, 'signing.key.pem');
+    const keyPath = join(LOCAL_KEY_PATH, 'signing.key.pem');
     let privateKey;
     try {
-      privateKey = await fs.readFile(keyPath, 'utf8');
+      privateKey = await readFile(keyPath, 'utf8');
     } catch {
-      // Auto-generate a placeholder notice in dev
       return {
         signature: '__DEV_PLACEHOLDER_SIGNATURE__',
         keyId: 'local-dev-key',
@@ -43,34 +43,28 @@ async function sign(data, algorithm = 'RSA-SHA256') {
       algorithm,
     };
   }
-
   if (PROVIDER === 'aws-kms') {
-    // TODO: implement via @aws-sdk/client-kms SignCommand
     throw new Error('[kms] AWS KMS signing not yet implemented.');
   }
-
   if (PROVIDER === 'gcp-kms') {
-    // TODO: implement via @google-cloud/kms
     throw new Error('[kms] GCP KMS signing not yet implemented.');
   }
-
   throw new Error(`[kms] Unknown KMS_PROVIDER: ${PROVIDER}`);
 }
 
 /**
  * Verifies a signature against data and a known key ID.
- *
  * @param {string | Buffer} data
  * @param {string} signature  — base64-encoded
  * @param {string} keyId
  * @param {string} [algorithm='RSA-SHA256']
  * @returns {Promise<boolean>}
  */
-async function verify(data, signature, keyId, algorithm = 'RSA-SHA256') {
+export async function verify(data, signature, keyId, algorithm = 'RSA-SHA256') {
   if (PROVIDER === 'local') {
-    const keyPath = path.join(LOCAL_KEY_PATH, 'signing.pub.pem');
+    const keyPath = join(LOCAL_KEY_PATH, 'signing.pub.pem');
     try {
-      const publicKey = await fs.readFile(keyPath, 'utf8');
+      const publicKey = await readFile(keyPath, 'utf8');
       const verifier = createVerify(algorithm);
       verifier.update(data);
       verifier.end();
@@ -83,14 +77,11 @@ async function verify(data, signature, keyId, algorithm = 'RSA-SHA256') {
 }
 
 /**
- * Generates an HMAC-SHA256 token (used for public receipt tokens).
- *
+ * Generates an HMAC-SHA256 token (utility helper).
  * @param {string} payload
  * @returns {string}  hex digest
  */
-function hmacToken(payload) {
+export function hmacToken(payload) {
   const secret = process.env.JWT_SECRET ?? 'dev-hmac-secret';
   return createHmac('sha256', secret).update(payload).digest('hex');
 }
-
-module.exports = { sign, verify, hmacToken };

@@ -1,53 +1,26 @@
-/**
- * auth.js — JWT authentication middleware
- *
- * Verifies Bearer tokens, attaches decoded payload to req.user,
- * and sets req.orgId for downstream tenant scoping.
- */
-'use strict';
+import jwt from 'jsonwebtoken';
+import { query } from '../config/db.js';
 
-const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET;
-
-/**
- * requireAuth middleware — rejects unauthenticated requests.
- */
-function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing or malformed Authorization header.' });
-  }
-
-  const token = authHeader.slice(7);
+export async function requireAuth(req, res, next) {
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
-    req.user = payload;          // { sub, email, role, orgId, ... }
-    req.orgId = payload.orgId;   // Current tenant org
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing or malformed Authorization header.' });
+    }
+    const token = authHeader.slice(7);
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({ error: err.name === 'TokenExpiredError' ? 'Token expired.' : 'Invalid token.' });
+    }
+    const result = await query('SELECT id, email, is_active FROM users WHERE id = $1', [payload.sub]);
+    if (!result.rows.length || !result.rows[0].is_active) {
+      return res.status(401).json({ error: 'User not found or inactive.' });
+    }
+    req.user = { id: result.rows[0].id, email: result.rows[0].email };
     next();
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired.' });
-    }
-    return res.status(401).json({ error: 'Invalid token.' });
+    next(err);
   }
 }
-
-/**
- * optionalAuth — sets req.user if token present, else continues.
- * Used for public receipt endpoints that accept optional auth.
- */
-function optionalAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (authHeader?.startsWith('Bearer ')) {
-    try {
-      req.user = jwt.verify(authHeader.slice(7), JWT_SECRET);
-      req.orgId = req.user.orgId;
-    } catch {
-      // Invalid token — treat as unauthenticated
-    }
-  }
-  next();
-}
-
-module.exports = { requireAuth, optionalAuth };

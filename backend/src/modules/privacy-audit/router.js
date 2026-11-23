@@ -1,26 +1,23 @@
 /**
- * privacy-audit/router.js
- * Handles: data_subject_requests, access_audit_log
+ * privacy-audit/router.js — paths relative to /api/v1
  */
-'use strict';
-
-const { Router } = require('express');
-const { requireAuth } = require('../../middlewares/auth');
-const { requireRole } = require('../../middlewares/rbac');
-const { attachTenantClient } = require('../../middlewares/tenantScope');
+import { Router } from 'express';
+import { requireAuth } from '../../middlewares/auth.js';
+import { requireRole } from '../../middlewares/rbac.js';
+import { tenantScope } from '../../middlewares/tenantScope.js';
+import * as ctrl from './controller.js';
 
 const router = Router();
+const auth = [requireAuth, tenantScope];
+const adminOnly = [...auth, requireRole('ORG_ADMIN')];
 
-// --- Data Subject Requests (GDPR / DPDP) ---
-// POST   /api/v1/privacy/dsr              (submit erasure or portability request)
-// GET    /api/v1/privacy/dsr              (org_admin: list all DSRs)
-// GET    /api/v1/privacy/dsr/:id          (status of a specific DSR)
-// PATCH  /api/v1/privacy/dsr/:id/process  (org_admin: process DSR)
+// DSR — any authenticated member can file; ORG_ADMIN manages
+router.post('/privacy/dsrs', ...auth, ctrl.createDsr);
+router.get('/privacy/dsrs', ...adminOnly, ctrl.listDsrs);
+router.get('/privacy/dsrs/:id', ...adminOnly, ctrl.getDsr);
+router.patch('/privacy/dsrs/:id', ...adminOnly, ctrl.updateDsr);
 
-// --- Access Audit Log (ER-10) ---
-// GET    /api/v1/privacy/audit-log        (org_admin / super_admin: paginated audit log)
-// GET    /api/v1/privacy/audit-log/:table (filter by table name)
+// Audit logs — ORG_ADMIN + AUDITOR can read
+router.get('/audit-logs', ...auth, requireRole('ORG_ADMIN', 'AUDITOR'), ctrl.listAuditLogs);
 
-router.get('/health', (_req, res) => res.json({ module: 'privacy-audit', status: 'ok' }));
-
-module.exports = router;
+export default router;

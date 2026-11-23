@@ -1,23 +1,30 @@
 /**
- * public-receipts/router.js
- * Handles: public_receipt_tokens — token-hashed donor-facing endpoints
+ * public-receipts/router.js — paths relative to /api/v1
+ * Public unauthenticated endpoints with strict rate limiting.
  */
-'use strict';
-
-const { Router } = require('express');
-const { optionalAuth } = require('../../middlewares/auth');
+import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
+import * as ctrl from './controller.js';
 
 const router = Router();
 
-// --- Public Receipt Verification (no auth required) ---
-// GET    /api/v1/receipts/:token            (verify receipt by HMAC token)
-// GET    /api/v1/receipts/:token/pdf        (download PDF receipt)
-// GET    /api/v1/receipts/:token/ledger     (view associated ledger event)
+const receiptLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many receipt requests. Please try again later.' },
+});
 
-// --- Token Management (authenticated) ---
-// POST   /api/v1/receipts/generate          (generate token for a contribution)
-// DELETE /api/v1/receipts/:token            (revoke token)
+const dashboardLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-router.get('/health', optionalAuth, (_req, res) => res.json({ module: 'public-receipts', status: 'ok' }));
+// ER-09: token-based public receipt (allowlisted DTO, zero donor PII)
+router.get('/public/receipts/:rawToken', receiptLimiter, ctrl.publicReceipt);
+router.get('/public/dashboard/:organisationId', dashboardLimiter, ctrl.publicDashboard);
 
-module.exports = router;
+export default router;

@@ -1,45 +1,35 @@
 /**
- * canonicalJson.js — Deterministic JSON serialisation
+ * canonicalJson.js — Deterministic JSON serialisation for cryptographic use.
  *
- * Produces a canonical (key-sorted, normalised) JSON string suitable
- * for cryptographic signing of ledger events and receipts.
+ * Rules:
+ * - All object keys sorted recursively
+ * - Prohibited PII/secret keys stripped before hashing
+ * - Arrays preserved in insertion order (not sorted)
  */
-'use strict';
 
-/**
- * Recursively sorts object keys and normalises values for
- * deterministic serialisation.
- *
- * @param {any} value
- * @returns {any}
- */
-function normalise(value) {
+const PROHIBITED_KEYS = new Set([
+  'email', 'password_hash', 'donor_name', 'beneficiary_name',
+  'object_key', 'signed_url', 'private_key_location_reference',
+  'donor_reference', 'payment_provider_reference',
+]);
+
+function sortKeys(value) {
   if (value === null || typeof value !== 'object') return value;
-  if (Array.isArray(value)) return value.map(normalise);
+  if (Array.isArray(value)) return value.map(sortKeys);
   return Object.keys(value)
     .sort()
-    .reduce((acc, k) => { acc[k] = normalise(value[k]); return acc; }, {});
+    .reduce((acc, k) => {
+      if (!PROHIBITED_KEYS.has(k)) {
+        acc[k] = sortKeys(value[k]);
+      }
+      return acc;
+    }, {});
 }
 
-/**
- * Serialises value to canonical JSON.
- *
- * @param {any} value
- * @returns {string}
- */
-function toCanonicalJson(value) {
-  return JSON.stringify(normalise(value));
+export function toCanonicalJson(value) {
+  return JSON.stringify(sortKeys(value));
 }
 
-/**
- * Parses a canonical JSON string back to a value.
- * (Alias for JSON.parse — included for symmetry.)
- *
- * @param {string} text
- * @returns {any}
- */
-function fromCanonicalJson(text) {
+export function fromCanonicalJson(text) {
   return JSON.parse(text);
 }
-
-module.exports = { toCanonicalJson, fromCanonicalJson, normalise };

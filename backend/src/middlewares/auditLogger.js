@@ -1,72 +1,69 @@
-/**
- * auditLogger.js — HTTP-level audit logging middleware
- *
- * Logs every mutating request (POST/PUT/PATCH/DELETE) to the
- * application audit trail. Sensitive PII fields are redacted.
- */
-'use strict';
-
-const winston = require('winston');
-
-const REDACTED = '[REDACTED]';
-const SENSITIVE_FIELDS = new Set([
-  'password', 'mfa_secret', 'pan_number', 'aadhaar_last4',
-  'donor_email', 'donor_phone', 'national_id',
-]);
-
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json(),
-  ),
-  transports: [
-    new winston.transports.Console(),
-    // TODO: add file / external SIEM transport for production
-  ],
-});
+import { query } from '../config/db.js';
 
 /**
- * Recursively redacts sensitive keys from an object clone.
+ * writeAuditLog — fire-and-forget, never throws.
+ * @param {Object} entry
+ * @param {string}  entry.organisation_id
+ * @param {string}  entry.actor_user_id
+ * @param {string}  entry.action         e.g. 'POST /contributions'
+ * @param {string}  entry.resource_type  e.g. 'contributions'
+ * @param {string}  [entry.resource_id]
+ * @param {'SUCCESS'|'DENIED'|'ERROR'} entry.outcome
+ * @param {string}  [entry.request_id]
+ * @param {string}  [entry.ip_address]
+ * @param {Object}  [entry.metadata]
  */
-function redact(obj) {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(redact);
-  return Object.fromEntries(
-    Object.entries(obj).map(([k, v]) => [
-      k,
-      SENSITIVE_FIELDS.has(k.toLowerCase()) ? REDACTED : redact(v),
-    ]),
-  );
+export function writeAuditLog(entry) {
+  const {
+    organisation_id = null,
+    actor_user_id = null,
+    action,
+    resource_type,
+    resource_id = null,
+    outcome,
+    request_id = null,
+    ip_address = null,
+    metadata = {},
+  } = entry;
+
+  // Fire-and-forget: intentionally not awaited
+  query(
+    `INSERT INTO access_audit_log
+       (organisation_id, actor_user_id, action, resource_type, resource_id,
+        outcome, request_id, ip_address, metadata)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8::inet,$9)`,
+    [
+      organisation_id,
+      actor_user_id,
+      action,
+      resource_type,
+      resource_id,
+      outcome,
+      request_id,
+      ip_address,
+      JSON.stringify(metadata),
+    ]
+  ).catch((err) => {
+    console.error('[audit] Failed to write audit log entry:', err.message);
+  });
 }
 
 /**
- * auditLog middleware — logs mutating HTTP requests.
+ * HTTP-level audit middleware — attaches helpers to res.locals.
  */
-function auditLog(req, res, next) {
-  const MUTATING = ['POST', 'PUT', 'PATCH', 'DELETE'];
-  if (!process.env.AUDIT_LOG_ENABLED || !MUTATING.includes(req.method)) {
-    return next();
-  }
-
-  const start = Date.now();
-  res.on('finish', () => {
-    logger.info({
-      type: 'http_audit',
-      method: req.method,
-      path: req.path,
-      statusCode: res.statusCode,
-      durationMs: Date.now() - start,
-      orgId: req.orgId ?? null,
-      userId: req.user?.sub ?? null,
-      userRole: req.user?.role ?? null,
-      body: redact(req.body),
-      ip: req.ip,
-      userAgent: req.headers['user-agent'],
+export function auditMiddleware(req, res, next) {
+  res.locals.audit = (resource_type, resource_id, outcome, metadata = {}) => {
+    writeAuditLog({
+      organisation_id: req.orgContext?.organisation_id ?? null,
+      actor_user_id: req.user?.id ?? null,
+      action: `${req.method} ${req.path}`,
+      resource_type,
+      resource_id,
+      outcome,
+      request_id: req.headers['x-request-id'] ?? null,
+      ip_address: req.ip,
+      metadata,
     });
-  });
-
+  };
   next();
 }
-
-module.exports = { auditLog, logger, redact };
