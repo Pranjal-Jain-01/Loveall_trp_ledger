@@ -1,13 +1,9 @@
 
-<<<<<<< HEAD
 import { useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { jsPDF } from 'jspdf';
-import './DonorTracePage.css';
-=======
 
 import '../DonorTracePage.css';
->>>>>>> 4c4a576 (no caption)
 
 export default function DonorTracePage() {
   // Temporary demonstration data.
