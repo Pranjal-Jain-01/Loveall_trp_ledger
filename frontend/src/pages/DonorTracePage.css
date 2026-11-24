@@ -1,0 +1,530 @@
+
+/* =====================================
+   LOVEALL DONORTRACE
+   Responsive Receipt Verification Page
+===================================== */
+
+/* Scoped reset: does not affect friend's pages */
+.trace-page,
+.trace-page * {
+  box-sizing: border-box;
+}
+
+.trace-page {
+  --cream: #F2EFE7;
+  --soft-teal: #9ACBD0;
+  --accent-teal: #48A6A7;
+  --deep-teal: #006A71;
+
+  min-height: 100vh;
+  padding: 34px 5%;
+  background: var(--cream);
+  color: #171717;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =====================================
+   HEADER
+===================================== */
+
+.trace-header {
+  max-width: 1100px;
+  margin: 0 auto 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.trace-brand h1 {
+  margin: 0;
+  color: var(--deep-teal);
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 700;
+  letter-spacing: -2px;
+}
+
+.public-verification {
+  background: #D9EDDC;
+  color: #168348;
+  padding: 11px 22px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+/* =====================================
+   MAIN WRAPPER
+===================================== */
+
+.trace-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* =====================================
+   RECEIPT CARD
+===================================== */
+
+.receipt-card {
+  background: #FFFFFF;
+  border-radius: 30px;
+  padding: 42px 40px;
+  box-shadow: 0 8px 30px rgba(0, 60, 60, 0.04);
+}
+
+/* =====================================
+   RECEIPT HEADING
+===================================== */
+
+.receipt-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.receipt-heading h2 {
+  margin: 0;
+  font-size: clamp(25px, 3vw, 36px);
+  font-weight: 700;
+  color: #151515;
+}
+
+.verification-badge {
+  background: #DDF2E5;
+  color: #18804C;
+  padding: 11px 19px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.receipt-divider {
+  height: 3px;
+  width: 100%;
+  background: var(--soft-teal);
+  margin: 42px 0 55px;
+}
+
+/* =====================================
+   CONTRIBUTION DETAILS
+===================================== */
+
+.contribution-section {
+  margin-bottom: 48px;
+}
+
+.section-title {
+  color: var(--deep-teal);
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 45px;
+}
+
+.contribution-amount {
+  color: var(--deep-teal);
+  font-size: clamp(42px, 6vw, 64px);
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  overflow-wrap: anywhere;
+}
+
+.amount-caption {
+  color: #666666;
+  font-size: 19px;
+  margin: 15px 0 32px;
+}
+
+/* Fund Pool */
+
+.fund-pool-box {
+  background: var(--cream);
+  border-radius: 20px;
+  padding: 28px 32px;
+}
+
+.fund-pool-box h3 {
+  font-size: 25px;
+  margin: 0 0 15px;
+  color: #171717;
+}
+
+.fund-pool-box p {
+  font-size: clamp(21px, 3vw, 29px);
+  margin: 0;
+  color: #222222;
+  overflow-wrap: anywhere;
+}
+
+/* =====================================
+   COMMON SECTION HEADINGS
+===================================== */
+
+.allocation-section,
+.activity-section,
+.audit-section {
+  margin-top: 45px;
+}
+
+.main-section-heading {
+  font-size: clamp(23px, 3vw, 31px);
+  font-weight: 700;
+  margin: 0 0 30px;
+  color: #171717;
+}
+
+/* =====================================
+   ALLOCATION & DISBURSEMENT
+===================================== */
+
+.allocation-box {
+  background: var(--cream);
+  border-radius: 20px;
+  padding: 24px 32px;
+}
+
+.allocation-item {
+  padding: 17px 0;
+  border-bottom: 2px solid rgba(72, 166, 167, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.allocation-item:last-of-type {
+  border-bottom: none;
+}
+
+.allocation-item span {
+  font-size: 20px;
+  color: #222222;
+}
+
+.allocation-item strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--deep-teal);
+  overflow-wrap: anywhere;
+}
+
+.allocation-note {
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #657574;
+}
+
+/* =====================================
+   ACTIVITY & PROOF
+===================================== */
+
+.activity-proof-box {
+  background: var(--cream);
+  padding: 22px;
+  border-radius: 20px;
+}
+
+.activity-image-placeholder {
+  min-height: 210px;
+  background: var(--soft-teal);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  text-align: center;
+  color: var(--deep-teal);
+}
+
+.activity-icon {
+  width: 55px;
+  height: 55px;
+}
+
+.activity-image-placeholder p {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.activity-hash {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.activity-hash span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--deep-teal);
+}
+
+.activity-hash code {
+  color: #4C6666;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+/* =====================================
+   CRYPTOGRAPHIC AUDITING
+===================================== */
+
+.audit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.audit-item {
+  background: var(--cream);
+  border-radius: 17px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.audit-icon {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border: 3px solid var(--deep-teal);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--deep-teal);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.audit-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.audit-content span {
+  font-size: 18px;
+  color: #333333;
+}
+
+.audit-content code {
+  font-size: 12px;
+  color: var(--deep-teal);
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+/* =====================================
+   LEDGER VERIFICATION
+===================================== */
+
+.ledger-verification {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 35px;
+  color: var(--deep-teal);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ledger-check {
+  width: 27px;
+  height: 27px;
+  border: 3px solid var(--deep-teal);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+.demo-notice {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #777777;
+}
+
+/* =====================================
+   FOOTER
+===================================== */
+
+.trace-footer {
+  text-align: center;
+  padding: 30px 10px 10px;
+  color: var(--deep-teal);
+  font-size: 16px;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* =====================================
+   TABLET RESPONSIVENESS
+===================================== */
+
+@media (max-width: 768px) {
+  .trace-page {
+    padding: 25px 4%;
+  }
+
+  .trace-header {
+    margin-bottom: 25px;
+  }
+
+  .receipt-card {
+    padding: 30px 25px;
+    border-radius: 25px;
+  }
+
+  .receipt-divider {
+    margin: 32px 0 40px;
+  }
+
+  .section-title {
+    margin-bottom: 30px;
+  }
+
+  .allocation-box {
+    padding: 20px 24px;
+  }
+
+  .fund-pool-box {
+    padding: 24px;
+  }
+}
+
+/* =====================================
+   MOBILE RESPONSIVENESS
+===================================== */
+
+@media (max-width: 480px) {
+  .trace-page {
+    padding: 20px 12px;
+  }
+
+  .trace-header {
+    margin-bottom: 22px;
+    gap: 10px;
+  }
+
+  .trace-brand h1 {
+    font-size: 37px;
+    letter-spacing: -1px;
+  }
+
+  .public-verification {
+    padding: 9px 12px;
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .receipt-card {
+    padding: 24px 17px;
+    border-radius: 22px;
+  }
+
+  .receipt-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .receipt-heading h2 {
+    font-size: 25px;
+  }
+
+  .verification-badge {
+    font-size: 12px;
+    padding: 9px 14px;
+  }
+
+  .receipt-divider {
+    margin: 27px 0 35px;
+  }
+
+  .section-title {
+    font-size: 19px;
+    margin-bottom: 28px;
+  }
+
+  .contribution-amount {
+    font-size: 43px;
+  }
+
+  .amount-caption {
+    font-size: 16px;
+  }
+
+  .fund-pool-box {
+    padding: 21px;
+    border-radius: 15px;
+  }
+
+  .fund-pool-box h3 {
+    font-size: 22px;
+  }
+
+  .fund-pool-box p {
+    font-size: 21px;
+  }
+
+  .main-section-heading {
+    font-size: 23px;
+    margin-bottom: 22px;
+  }
+
+  .allocation-box {
+    padding: 17px 20px;
+    border-radius: 15px;
+  }
+
+  .allocation-item span {
+    font-size: 17px;
+  }
+
+  .activity-proof-box {
+    padding: 13px;
+    border-radius: 15px;
+  }
+
+  .activity-image-placeholder {
+    min-height: 175px;
+  }
+
+  .activity-image-placeholder p {
+    font-size: 15px;
+  }
+
+  .audit-item {
+    padding: 17px;
+    gap: 13px;
+  }
+
+  .audit-content span {
+    font-size: 15px;
+  }
+
+  .audit-content code {
+    font-size: 11px;
+  }
+
+  .ledger-verification {
+    font-size: 16px;
+  }
+
+  .trace-footer {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+}
