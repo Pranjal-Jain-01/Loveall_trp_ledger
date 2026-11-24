@@ -460,7 +460,7 @@ function ComplianceBanner({ message, type, onDismiss }: ComplianceBannerProps) {
 
   return (
     <div className={`flex items-start gap-3 p-4 rounded-lg border ${typeStyles[type]}`}>
-      <div className="flex-shrink-0 mt-0.5">{typeIcons[type]}</div>
+      <div className="shrink-0 mt-0.5">{typeIcons[type]}</div>
       <div className="flex-1">
         <p className="text-sm font-medium">{message}</p>
       </div>
@@ -468,7 +468,7 @@ function ComplianceBanner({ message, type, onDismiss }: ComplianceBannerProps) {
         <button
           type="button"
           onClick={onDismiss}
-          className="flex-shrink-0 p-1 text-current opacity-50 hover:opacity-100"
+          className="shrink-0 p-1 text-current opacity-50 hover:opacity-100"
         >
           <XCircle className="w-4 h-4" />
         </button>
@@ -1029,7 +1029,7 @@ function AuditDrawer({
             <div className="space-y-2">
               {COMPLIANCE_GUARDRAILS.map((guard) => (
                 <div key={guard.code} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
                   <span className="text-sm text-slate-700">{guard.label}</span>
                   <span className="ml-auto text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
                     ENFORCED
@@ -1090,7 +1090,7 @@ function AuditDrawer({
                           </code>
                         </div>
                       </div>
-                      <div className="flex-shrink-0" title="Cryptographically verified">
+                      <div className="shrink-0" title="Cryptographically verified">
                         <Shield className="w-5 h-5 text-emerald-500" />
                       </div>
                     </div>
