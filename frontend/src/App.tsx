@@ -1,67 +1,29 @@
-/**
- * App.tsx — Portal-based routing
- *
- * Routes are grouped by portal. The active portal is determined by
- * VITE_PORTAL_MODE env var (useful for multi-domain deployments)
- * or by URL prefix in single-domain mode.
- */
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-// Portal index pages (lazy-loaded)
-import AdminPortal from './portals/admin/index';
-import FieldPwaPortal from './portals/field-pwa/index';
-import VerifierPortal from './portals/verifier/index';
-import PublicPortal from './portals/public/index';
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      retry: 2,
-    },
-  },
-});
-
-const PORTAL_MODE = import.meta.env.VITE_PORTAL_MODE ?? 'admin';
+import LandingPage from './pages/LandingPage';
+import DonorVerifyPage from './pages/DonorVerifyPage';
+import DonorTracePage from './pages/DonorTracePage';
+import StaffLoginPage from './pages/StaffLoginPage';
+import RoleWorkspacePage from './pages/RoleWorkspacePage';
+import FundPoolsPage from './pages/FundPoolsPage';
+import DisbursementsPage from './pages/DisbursementsPage';
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          {/* Admin & Finance Officer portal */}
-          <Route path="/admin/*" element={<AdminPortal />} />
+    <BrowserRouter>
+      <Routes>
+        {/* Public — Donor flow */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/donor/verify" element={<DonorVerifyPage />} />
+        <Route path="/donor/trace/:token" element={<DonorTracePage />} />
 
-          {/* Field Worker mobile PWA */}
-          <Route path="/field/*" element={<FieldPwaPortal />} />
-
-          {/* Supervisor & Independent Verifier */}
-          <Route path="/verify/*" element={<VerifierPortal />} />
-
-          {/* Public donor dashboard & receipt verifier */}
-          <Route path="/public/*" element={<PublicPortal />} />
-          <Route path="/r/:token" element={<PublicPortal />} />
-
-          {/* Root redirect based on portal mode */}
-          <Route
-            path="/"
-            element={
-              <Navigate
-                to={
-                  PORTAL_MODE === 'admin' ? '/admin'
-                  : PORTAL_MODE === 'field-pwa' ? '/field'
-                  : PORTAL_MODE === 'verifier' ? '/verify'
-                  : '/public'
-                }
-                replace
-              />
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
+        {/* Protected — Staff flow */}
+        <Route path="/staff/login" element={<StaffLoginPage />} />
+        <Route path="/staff/workspaces" element={<RoleWorkspacePage />} />
+        <Route path="/staff/fund-pools" element={<FundPoolsPage />} />
+        <Route path="/staff/disbursements" element={<DisbursementsPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
