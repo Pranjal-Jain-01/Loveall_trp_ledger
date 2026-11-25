@@ -154,22 +154,29 @@ function displayStatus(status: Disbursement['status']): string {
 
 function SummaryCard({ title, value, subtitle, icon, color = 'primary' }: SummaryCardProps) {
   const colorStyles = {
-    primary: 'border-l-petrol bg-mist/20',
-    secondary: 'border-l-seafoam bg-mist/15',
-    warning: 'border-l-amber-500 bg-amber-50',
-    success: 'border-l-emerald-500 bg-emerald-50',
+    primary: 'border-l-brand-600 bg-brand-50',
+    secondary: 'border-l-brand-500 bg-brand-50/50',
+    warning: 'border-l-warning-500 bg-warning-50',
+    success: 'border-l-success-500 bg-success-50',
+  };
+
+  const iconBgStyles = {
+    primary: 'bg-brand-100 text-brand-600',
+    secondary: 'bg-brand-50 text-brand-500',
+    warning: 'bg-warning-50 text-warning-600',
+    success: 'bg-success-50 text-success-600',
   };
 
   return (
-    <div className={`flex flex-col p-4 bg-surface border border-hairline rounded-xl border-l-4 ${colorStyles[color]} relative overflow-hidden`}>
+    <div className={`flex flex-col p-4 bg-surface border border-default rounded-xl border-l-4 ${colorStyles[color]} relative overflow-hidden`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium text-ink/60 uppercase tracking-wide">{title}</p>
+          <p className="text-xs font-medium text-muted uppercase tracking-wide">{title}</p>
           <p className="mt-1 font-mono tabular-nums text-2xl font-semibold text-ink">{value}</p>
-          {subtitle && <p className="mt-0.5 text-xs text-ink/55">{subtitle}</p>}
+          {subtitle && <p className="mt-0.5 text-xs text-muted">{subtitle}</p>}
         </div>
         {icon && (
-          <div className="p-2 bg-surface/70 rounded-lg text-seafoam">
+          <div className={`p-2 rounded-lg ${iconBgStyles[color]}`}>
             {icon}
           </div>
         )}
@@ -189,15 +196,15 @@ function FilterToolbar({
   onSearchChange,
 }: FilterToolbarProps) {
   return (
-    <div className="flex flex-col lg:flex-row gap-3 p-4 bg-surface border border-hairline rounded-xl">
+    <div className="flex flex-col lg:flex-row gap-3 p-4 bg-surface border border-default rounded-xl">
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
         <input
           type="text"
           placeholder="Search by recipient, programme, or UTR…"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 text-sm border border-hairline rounded-lg focus:outline-none focus:ring-2 focus:ring-seafoam focus:border-transparent bg-surface text-ink"
+          className="input pl-10"
         />
       </div>
 
@@ -209,8 +216,8 @@ function FilterToolbar({
             onClick={() => onStatusFilterChange(option.value)}
             className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all ${
               statusFilter === option.value
-                ? 'bg-seafoam text-white shadow-sm'
-                : 'bg-canvas text-ink/70 hover:bg-mist/30 border border-hairline'
+                ? 'bg-brand-500 text-white shadow-sm'
+                : 'bg-canvas text-secondary hover:bg-brand-50 border border-default'
             }`}
           >
             {option.label}
@@ -219,11 +226,11 @@ function FilterToolbar({
       </div>
 
       <div className="flex items-center gap-2">
-        <label className="text-xs text-ink/55">Pool source:</label>
+        <label className="text-xs text-muted">Pool source:</label>
         <select
           value={sourceFilter}
           onChange={(e) => onSourceFilterChange(e.target.value as FundPoolSourceFilter)}
-          className="px-3 py-1.5 text-sm border border-hairline rounded-lg bg-surface text-ink focus:outline-none focus:ring-2 focus:ring-seafoam focus:border-transparent"
+          className="input"
         >
           {SOURCE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -254,32 +261,32 @@ function DisbursementTable({
 }: DisbursementTableProps) {
   if (isLoading) {
     return (
-      <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Disbursement / Date</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Source Fund Pool</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Recipient</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Programme & Agreement</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wide">Amount (INR)</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Payment Ref (UTR)</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Actions</th>
+              <tr className="bg-brand-600 text-white">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Disbursement / Date</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Source Fund Pool</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Recipient</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Programme & Agreement</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide">Amount (INR)</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Payment Ref (UTR)</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody>
               {[...Array(5)].map((_, i) => (
-                <tr key={i} className="border-b border-slate-100">
-                  <td className="px-4 py-4"><div className="h-4 w-24 bg-slate-200 animate-pulse rounded"></div></td>
-                  <td className="px-4 py-4"><div className="h-4 w-20 bg-slate-200 animate-pulse rounded"></div></td>
-                  <td className="px-4 py-4"><div className="h-4 w-28 bg-slate-200 animate-pulse rounded"></div></td>
-                  <td className="px-4 py-4"><div className="h-4 w-32 bg-slate-200 animate-pulse rounded"></div></td>
-                  <td className="px-4 py-4 text-right"><div className="h-5 w-24 bg-slate-200 animate-pulse rounded mx-auto"></div></td>
-                  <td className="px-4 py-4"><div className="h-4 w-24 bg-slate-200 animate-pulse rounded"></div></td>
-                  <td className="px-4 py-4"><div className="h-5 w-20 bg-slate-200 animate-pulse rounded"></div></td>
-                  <td className="px-4 py-4"><div className="h-6 w-24 bg-slate-200 animate-pulse rounded"></div></td>
+                <tr key={i} className="border-b border-default">
+                  <td className="px-4 py-4"><div className="h-4 w-24 skeleton rounded"></div></td>
+                  <td className="px-4 py-4"><div className="h-4 w-20 skeleton rounded"></div></td>
+                  <td className="px-4 py-4"><div className="h-4 w-28 skeleton rounded"></div></td>
+                  <td className="px-4 py-4"><div className="h-4 w-32 skeleton rounded"></div></td>
+                  <td className="px-4 py-4 text-right"><div className="h-5 w-24 skeleton rounded mx-auto"></div></td>
+                  <td className="px-4 py-4"><div className="h-4 w-24 skeleton rounded"></div></td>
+                  <td className="px-4 py-4"><div className="h-5 w-20 skeleton rounded"></div></td>
+                  <td className="px-4 py-4"><div className="h-6 w-24 skeleton rounded"></div></td>
                 </tr>
               ))}
             </tbody>
@@ -291,40 +298,40 @@ function DisbursementTable({
 
   if (error) {
     return (
-      <div className="p-8 text-center bg-surface border border-hairline rounded-xl">
-        <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-3" />
-        <p className="text-slate-600">{error}</p>
+      <div className="p-8 text-center card">
+        <AlertTriangle className="w-12 h-12 text-warning-500 mx-auto mb-3" />
+        <p className="text-muted">{error}</p>
       </div>
     );
   }
 
   if (disbursements.length === 0) {
     return (
-      <div className="p-12 text-center bg-surface border border-hairline rounded-xl">
-        <FileText className="w-16 h-16 text-mist mx-auto mb-4" />
+      <div className="p-12 text-center card">
+        <FileText className="w-16 h-16 text-brand-300 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-ink mb-1">No disbursements found</h3>
-        <p className="text-ink/55">Try adjusting your filters or create a new disbursement.</p>
+        <p className="text-muted">Try adjusting your filters or create a new disbursement.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
+    <div className="card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-petrol border-b border-hairline">
-              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wide">Date / ID</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wide">Source Pool</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wide">Recipient</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wide">Programme &amp; Agreement</th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-white uppercase tracking-wide">INR Amount</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wide">Payment Ref (UTR)</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wide">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wide">Actions</th>
+            <tr className="bg-brand-600 text-white">
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Date / ID</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Source Pool</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Recipient</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Programme & Agreement</th>
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide">INR Amount</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Payment Ref (UTR)</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Status</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-hairline">
+          <tbody className="divide-y divide-default">
             {disbursements.map((disbursement) => {
               const pool = fundPools.find((p) => p.id === disbursement.fund_pool_id);
               const origin: FundOrigin = pool?.source_origin ?? 'DOMESTIC';
@@ -334,11 +341,11 @@ function DisbursementTable({
               <tr
                 key={disbursement.id}
                 onClick={() => onRowClick(disbursement)}
-                className="hover:bg-mist/15 transition-colors cursor-pointer"
+                className="hover:bg-brand-50 transition-colors cursor-pointer"
               >
                 <td className="px-4 py-4">
                   <div>
-                    <p className="text-xs text-ink/55">{formatDate(disbursement.created_at)}</p>
+                    <p className="text-xs text-muted">{formatDate(disbursement.created_at)}</p>
                     <p className="font-mono tabular-nums text-sm font-medium text-ink mt-0.5">
                       {truncateId(disbursement.id, 12)}
                     </p>
@@ -371,12 +378,12 @@ function DisbursementTable({
                     </p>
                     {disbursement.conditional_release && (
                       <div className="flex items-center gap-1 mt-1">
-                        <Lock className="w-3 h-3 text-petrol" />
-                        <span className="text-xs text-petrol font-medium">Conditional release</span>
+                        <Lock className="w-3 h-3 text-brand-600" />
+                        <span className="text-xs text-brand-600 font-medium">Conditional release</span>
                       </div>
                     )}
                     {disbursement.funding_agreement_id && (
-                      <p className="text-xs text-ink/55 mt-0.5">
+                      <p className="text-xs text-muted mt-0.5">
                         {agreement ? agreement.agreement_code : `Agreement ${truncateId(disbursement.funding_agreement_id, 8)}`}
                       </p>
                     )}
@@ -389,11 +396,11 @@ function DisbursementTable({
                 </td>
                 <td className="px-4 py-4">
                   {disbursement.payment_reference ? (
-                    <span className="font-mono text-sm bg-canvas px-2 py-0.5 rounded border border-hairline">
+                    <span className="font-mono text-sm bg-canvas px-2 py-0.5 rounded border border-default">
                       {disbursement.payment_reference}
                     </span>
                   ) : (
-                    <span className="text-xs text-ink/40 italic">Awaiting execution</span>
+                    <span className="text-xs text-muted italic">Awaiting execution</span>
                   )}
                 </td>
                 <td className="px-4 py-4">
@@ -407,7 +414,7 @@ function DisbursementTable({
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); onApprove(disbursement); }}
-                        className="p-1.5 text-ink/50 hover:text-petrol hover:bg-mist/30 rounded-lg transition-colors"
+                        className="p-1.5 text-muted hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
                         title="Approve"
                       >
                         <CheckCircle className="w-4 h-4" />
@@ -417,7 +424,7 @@ function DisbursementTable({
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); onExecute(disbursement); }}
-                        className="p-1.5 text-ink/50 hover:text-petrol hover:bg-mist/30 rounded-lg transition-colors"
+                        className="p-1.5 text-muted hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
                         title="Execute / Record UTR"
                       >
                         <ArrowRight className="w-4 h-4" />
@@ -426,7 +433,7 @@ function DisbursementTable({
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); onViewAudit(disbursement); }}
-                      className="p-1.5 text-ink/50 hover:text-petrol hover:bg-mist/30 rounded-lg transition-colors"
+                      className="p-1.5 text-muted hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
                       title="Inspect Audit Trail"
                     >
                       <Hash className="w-4 h-4" />
@@ -447,9 +454,9 @@ function DisbursementTable({
 
 function ComplianceBanner({ message, type, onDismiss }: ComplianceBannerProps) {
   const typeStyles = {
-    warning: 'bg-amber-50 border-amber-200 text-amber-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
-    info: 'bg-teal-50 border-teal-200 text-teal-800',
+    warning: 'bg-warning-50 border-warning-200 text-warning-800',
+    error: 'bg-error-50 border-error-200 text-error-800',
+    info: 'bg-brand-50 border-brand-200 text-brand-700',
   };
 
   const typeIcons = {
@@ -581,12 +588,12 @@ function ProposeDrawer({
       {/* Drawer */}
       <div className="w-full sm:max-w-2xl bg-white rounded-t-2xl sm:rounded-xl shadow-xl transform transition-transform sm:my-8 sm:mx-4 max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl sm:rounded-t-xl z-10">
-          <h2 className="text-lg font-semibold text-slate-900">Propose Disbursement</h2>
+        <div className="flex items-center justify-between p-4 border-b border-default sticky top-0 bg-white rounded-t-2xl sm:rounded-t-xl z-10">
+          <h2 className="text-lg font-semibold text-ink">Propose Disbursement</h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-2 text-muted hover:text-secondary rounded-lg hover:bg-brand-50 transition-colors"
           >
             <XCircle className="w-5 h-5" />
           </button>
@@ -618,15 +625,11 @@ function ProposeDrawer({
 
           {/* Fund Pool */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Fund Pool <span className="text-red-500">*</span>
-            </label>
+            <label className="label label-required">Fund Pool</label>
             <select
               value={formData.fund_pool_id}
               onChange={(e) => handleChange('fund_pool_id', e.target.value)}
-              className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                errors.fund_pool_id ? 'border-red-300' : 'border-slate-200'
-              }`}
+              className={`input ${errors.fund_pool_id ? 'input-error' : ''}`}
             >
               <option value="">Select a fund pool</option>
               {fundPools
@@ -637,16 +640,16 @@ function ProposeDrawer({
                   </option>
                 ))}
             </select>
-            {errors.fund_pool_id && <p className="mt-1 text-xs text-red-600">{errors.fund_pool_id}</p>}
+            {errors.fund_pool_id && <p className="form-error">{errors.fund_pool_id}</p>}
           </div>
 
           {/* Programme */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Programme</label>
+            <label className="label">Programme</label>
             <select
               value={formData.programme_id || ''}
               onChange={(e) => handleChange('programme_id', e.target.value || undefined)}
-              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="input"
             >
               <option value="">Select a programme (optional)</option>
               {programmes
@@ -661,103 +664,83 @@ function ProposeDrawer({
 
           {/* Recipient Kind */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Recipient Kind <span className="text-red-500">*</span>
-            </label>
+            <label className="label label-required">Recipient Kind</label>
             <select
               value={formData.recipient_kind}
               onChange={(e) => handleChange('recipient_kind', e.target.value as CreateDisbursementPayload['recipient_kind'])}
-              className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                errors.recipient_kind ? 'border-red-300' : 'border-slate-200'
-              }`}
+              className={`input ${errors.recipient_kind ? 'input-error' : ''}`}
             >
               {RECIPIENT_KIND_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
-            {errors.recipient_kind && <p className="mt-1 text-xs text-red-600">{errors.recipient_kind}</p>}
+            {errors.recipient_kind && <p className="form-error">{errors.recipient_kind}</p>}
           </div>
 
           {/* Recipient Organisation / Reference */}
           {formData.recipient_kind === 'PARTNER_NGO' ? (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Partner NGO Organisation <span className="text-red-500">*</span>
-              </label>
+              <label className="label label-required">Partner NGO Organisation</label>
               <input
                 type="text"
                 value={formData.recipient_organisation_id || ''}
                 onChange={(e) => handleChange('recipient_organisation_id', e.target.value || undefined)}
                 placeholder="Partner organisation UUID"
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-seafoam focus:border-transparent font-mono ${
-                  errors.recipient_organisation_id ? 'border-red-300' : 'border-hairline'
-                }`}
+                className={`input font-mono ${errors.recipient_organisation_id ? 'input-error' : ''}`}
               />
-              {errors.recipient_organisation_id && <p className="mt-1 text-xs text-red-600">{errors.recipient_organisation_id}</p>}
+              {errors.recipient_organisation_id && <p className="form-error">{errors.recipient_organisation_id}</p>}
             </div>
           ) : (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Recipient Reference <span className="text-red-500">*</span>
-              </label>
+              <label className="label label-required">Recipient Reference</label>
               <input
                 type="text"
                 value={formData.recipient_reference || ''}
                 onChange={(e) => handleChange('recipient_reference', e.target.value)}
                 placeholder="Vendor name, employee ID, beneficiary code, etc."
-                className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                  errors.recipient_reference ? 'border-red-300' : 'border-slate-200'
-                }`}
+                className={`input ${errors.recipient_reference ? 'input-error' : ''}`}
               />
-              {errors.recipient_reference && <p className="mt-1 text-xs text-red-600">{errors.recipient_reference}</p>}
+              {errors.recipient_reference && <p className="form-error">{errors.recipient_reference}</p>}
             </div>
           )}
 
           {/* Amount */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Amount (INR) <span className="text-red-500">*</span>
-            </label>
+            <label className="label label-required">Amount (INR)</label>
             <input
               type="number"
               step="0.01"
               min="0.01"
               value={formData.amount}
               onChange={(e) => handleChange('amount', parseFloat(e.target.value) || 0)}
-              className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-mono tabular-nums ${
-                errors.amount ? 'border-red-300' : 'border-slate-200'
-              }`}
+              className={`input font-mono tabular-nums ${errors.amount ? 'input-error' : ''}`}
               placeholder="0.00"
             />
-            {errors.amount && <p className="mt-1 text-xs text-red-600">{errors.amount}</p>}
+            {errors.amount && <p className="form-error">{errors.amount}</p>}
           </div>
 
           {/* Conditional Release */}
-          <div className="border-t border-slate-200 pt-4">
+          <div className="border-t border-default pt-4">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.conditional_release}
                 onChange={(e) => handleChange('conditional_release', e.target.checked)}
-                className="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500"
+                className="w-4 h-4 text-brand-500 border-default rounded focus:ring-brand-500"
               />
-              <span className="text-sm font-medium text-slate-700">Conditional Release</span>
+              <span className="text-sm font-medium text-secondary">Conditional Release</span>
             </label>
-            <p className="mt-1 text-xs text-slate-500 ml-7">
+            <p className="mt-1 text-xs text-muted ml-7">
               Funds will be held until agreement conditions are met and independently verified.
             </p>
 
             {formData.conditional_release && (
               <div className="mt-3">
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Funding Agreement <span className="text-red-500">*</span>
-                </label>
+                <label className="label label-required">Funding Agreement</label>
                 <select
                   value={formData.funding_agreement_id || ''}
                   onChange={(e) => handleChange('funding_agreement_id', e.target.value || undefined)}
-                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
-                    errors.funding_agreement_id ? 'border-red-300' : 'border-slate-200'
-                  }`}
+                  className={`input ${errors.funding_agreement_id ? 'input-error' : ''}`}
                 >
                   <option value="">Select a verified funding agreement</option>
                   {agreements
@@ -768,18 +751,18 @@ function ProposeDrawer({
                       </option>
                     ))}
                 </select>
-                {errors.funding_agreement_id && <p className="mt-1 text-xs text-red-600">{errors.funding_agreement_id}</p>}
+                {errors.funding_agreement_id && <p className="form-error">{errors.funding_agreement_id}</p>}
               </div>
             )}
           </div>
         </form>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-4 border-t border-slate-200 bg-slate-50/50 rounded-b-2xl sm:rounded-b-xl">
+        <div className="drawer-footer">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+            className="btn-secondary"
           >
             Cancel
           </button>
@@ -787,7 +770,7 @@ function ProposeDrawer({
             type="submit"
             form="propose-form"
             disabled={isSubmitting || foreignToPartnerWarning}
-            className="px-4 py-2 text-sm font-medium text-white bg-petrol rounded-lg hover:bg-petrol/90 focus:outline-none focus:ring-2 focus:ring-seafoam focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary"
           >
             {isSubmitting ? (
               <>
@@ -834,28 +817,26 @@ function ExecuteModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
       <div className="relative w-full max-w-md bg-white rounded-xl shadow-xl p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-2">Execute Disbursement</h2>
-        <p className="text-sm text-slate-500 mb-6">
+        <h2 className="text-lg font-semibold text-ink mb-2">Execute Disbursement</h2>
+        <p className="text-sm text-muted mb-6">
           Record the payment reference (UTR/NEFT/RTGS/UPI) for disbursement{" "}
-          <span className="font-mono tabular-nums text-teal-700">{truncateId(disbursement.id, 12)}</span>
+          <span className="font-mono tabular-nums text-brand-500">{truncateId(disbursement.id, 12)}</span>
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Payment Reference (UTR) <span className="text-red-500">*</span>
-            </label>
+            <label className="label label-required">Payment Reference (UTR)</label>
             <input
               type="text"
               value={paymentReference}
               onChange={(e) => setPaymentReference(e.target.value)}
               placeholder="e.g., NEFT1234567890 / AXMB231234567890"
-              className="w-full px-3 py-2 text-sm font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="input font-mono"
               autoFocus
             />
           </div>
 
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted">
             This is a mandatory field per compliance guardrail (UTR Payment Ref Required).
             The disbursement will be marked as PAID and a ledger event will be recorded.
           </p>
@@ -868,14 +849,14 @@ function ExecuteModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              className="btn-secondary"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !paymentReference.trim()}
-              className="px-4 py-2 text-sm font-medium text-white bg-petrol rounded-lg hover:bg-petrol/90 focus:outline-none focus:ring-2 focus:ring-seafoam focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="btn-primary"
             >
               {isSubmitting ? (
                 <>
@@ -911,9 +892,9 @@ function AuditDrawer({
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
-      <div className="absolute inset-y-0 right-0 w-full max-w-xl bg-surface border-l border-hairline shadow-xl flex flex-col animate-slideInRight">
+      <div className="absolute inset-y-0 right-0 w-full max-w-xl bg-surface border-l border-default shadow-xl flex flex-col animate-slideInRight">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-hairline bg-petrol text-white">
+        <div className="flex items-center justify-between p-4 border-b border-default bg-brand-600 text-white">
           <div>
             <h2 className="text-lg font-semibold">Disbursement Audit Trail</h2>
             <p className="text-sm text-white/70 font-mono tabular-nums">{truncateId(disbursement.id)}</p>
@@ -930,14 +911,14 @@ function AuditDrawer({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {/* Disbursement Metadata */}
-          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-            <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-teal-600" />
+          <div className="bg-canvas rounded-lg p-4 border border-default">
+            <h3 className="text-sm font-semibold text-ink mb-3 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-brand-500" />
               Disbursement Details
             </h3>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div>
-                <dt className="text-slate-500">Status</dt>
+                <dt className="text-muted">Status</dt>
                 <dd className="font-medium mt-0.5">
                   <span className={getStatusBadgeClass(disbursement.status)}>
                     {displayStatus(disbursement.status)}
@@ -945,13 +926,13 @@ function AuditDrawer({
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-500">Amount</dt>
-                <dd className="font-mono tabular-nums font-semibold text-slate-900 mt-0.5">
+                <dt className="text-muted">Amount</dt>
+                <dd className="font-mono tabular-nums font-semibold text-ink mt-0.5">
                   {formatINR(disbursement.amount)}
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-500">Fund Pool</dt>
+                <dt className="text-muted">Fund Pool</dt>
                 <dd className="font-medium mt-0.5">
                   {disbursement.fund_pool
                     ? `${disbursement.fund_pool.name} (${disbursement.fund_pool.source_origin})`
@@ -959,58 +940,58 @@ function AuditDrawer({
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-500">Programme</dt>
+                <dt className="text-muted">Programme</dt>
                 <dd className="font-medium mt-0.5">
                   {disbursement.programme?.name
                     || (disbursement.programme_id ? truncateId(disbursement.programme_id) : '—')}
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-500">Funding Agreement</dt>
+                <dt className="text-muted">Funding Agreement</dt>
                 <dd className="font-medium mt-0.5">
                   {disbursement.funding_agreement?.agreement_code
                     || (disbursement.funding_agreement_id ? truncateId(disbursement.funding_agreement_id) : '—')}
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-500">Recipient Kind</dt>
+                <dt className="text-muted">Recipient Kind</dt>
                 <dd className="font-medium mt-0.5 capitalize">{disbursement.recipient_kind.replace('_', ' ')}</dd>
               </div>
               <div>
-                <dt className="text-slate-500">Recipient</dt>
+                <dt className="text-muted">Recipient</dt>
                 <dd className="font-medium mt-0.5 font-mono tabular-nums">
                   {disbursement.recipient_organisation_id || disbursement.recipient_reference || '—'}
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-500">Conditional Release</dt>
+                <dt className="text-muted">Conditional Release</dt>
                 <dd className="font-medium mt-0.5 flex items-center gap-1">
                   {disbursement.conditional_release ? (
                     <>
-                      <Lock className="w-3 h-3 text-teal-600" />
-                      <span className="text-teal-700">Yes</span>
+                      <Lock className="w-3 h-3 text-brand-500" />
+                      <span className="text-brand-500">Yes</span>
                     </>
                   ) : (
-                    <span className="text-slate-500">No</span>
+                    <span className="text-muted">No</span>
                   )}
                 </dd>
               </div>
               <div>
-                <dt className="text-slate-500">Payment Reference</dt>
+                <dt className="text-muted">Payment Reference</dt>
                 <dd className="font-mono text-sm mt-0.5">
-                  {disbursement.payment_reference || <span className="text-slate-400 italic">Not recorded</span>}
+                  {disbursement.payment_reference || <span className="text-muted italic">Not recorded</span>}
                 </dd>
               </div>
               <div className="sm:col-span-2">
-                <dt className="text-slate-500">Ledger event hash</dt>
-                <dd className="font-mono text-xs mt-0.5 break-all text-petrol bg-mist/20 border border-hairline rounded px-2 py-1">
+                <dt className="text-muted">Ledger event hash</dt>
+                <dd className="font-mono text-xs mt-0.5 break-all text-brand-600 bg-brand-50 border border-default rounded px-2 py-1">
                   {disbursement.ledger_event_hash
                     || relatedEvents[relatedEvents.length - 1]?.event_hash
-                    || <span className="text-slate-400 italic">Not yet recorded</span>}
+                    || <span className="text-muted italic">Not yet recorded</span>}
                 </dd>
               </div>
               <div className="sm:col-span-2">
-                <dt className="text-slate-500">Timestamps</dt>
+                <dt className="text-muted">Timestamps</dt>
                 <dd className="mt-1 space-y-1 text-xs font-mono">
                   <div>Created: {formatDate(disbursement.created_at)}</div>
                   {disbursement.approved_at && <div>Approved: {formatDate(disbursement.approved_at)}</div>}
@@ -1022,16 +1003,16 @@ function AuditDrawer({
 
           {/* Compliance Checks */}
           <div>
-            <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-teal-600" />
+            <h3 className="text-sm font-semibold text-ink mb-3 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-brand-500" />
               Compliance Guardrails
             </h3>
             <div className="space-y-2">
               {COMPLIANCE_GUARDRAILS.map((guard) => (
-                <div key={guard.code} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
-                  <span className="text-sm text-slate-700">{guard.label}</span>
-                  <span className="ml-auto text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                <div key={guard.code} className="flex items-center gap-3 p-3 bg-white border border-default rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-success-500 shrink-0" />
+                  <span className="text-sm text-secondary">{guard.label}</span>
+                  <span className="ml-auto text-xs text-success-600 bg-success-50 px-2 py-0.5 rounded">
                     ENFORCED
                   </span>
                 </div>
@@ -1042,56 +1023,56 @@ function AuditDrawer({
           {/* Ledger Events */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                <Hash className="w-4 h-4 text-teal-600" />
+              <h3 className="text-sm font-semibold text-ink flex items-center gap-2">
+                <Hash className="w-4 h-4 text-brand-500" />
                 Ledger Events (SHA-256 Verification)
               </h3>
               {relatedEvents.length > 0 && (
-                <span className="text-xs text-slate-500">{relatedEvents.length} event(s)</span>
+                <span className="text-xs text-muted">{relatedEvents.length} event(s)</span>
               )}
             </div>
 
             {isLoading ? (
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="h-20 bg-slate-50 border border-slate-200 rounded-lg animate-pulse" />
+                  <div key={i} className="h-20 bg-canvas border border-default rounded-lg animate-pulse" />
                 ))}
               </div>
             ) : relatedEvents.length === 0 ? (
-              <div className="p-6 text-center bg-slate-50 border border-slate-200 rounded-lg">
-                <Hash className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                <p className="text-slate-500">No ledger events found for this disbursement.</p>
+              <div className="p-6 text-center bg-canvas border border-default rounded-lg">
+                <Hash className="w-12 h-12 text-muted/30 mx-auto mb-3" />
+                <p className="text-muted">No ledger events found for this disbursement.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {relatedEvents.map((event) => (
-                  <div key={event.id} className="bg-white border border-slate-200 rounded-lg p-4">
+                  <div key={event.id} className="bg-white border border-default rounded-lg p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                          <span className="text-xs font-medium text-muted uppercase tracking-wide">
                             {event.event_kind.replace(/_/g, ' ')}
                           </span>
-                          <span className="text-xs text-slate-400 font-mono tabular-nums">
+                          <span className="text-xs text-muted font-mono tabular-nums">
                             Seq: {event.sequence_number}
                           </span>
-                          <span className="text-xs text-slate-400">
+                          <span className="text-xs text-muted">
                             {formatDate(event.occurred_at)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-xs">
-                          <span className="text-slate-500">Hash:</span>
-                          <code className="font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded break-all">
+                          <span className="text-muted">Hash:</span>
+                          <code className="font-mono text-brand-500 bg-brand-50 px-2 py-0.5 rounded break-all">
                             {event.event_hash}
                           </code>
-                          <span className="text-slate-500">Prev:</span>
-                          <code className="font-mono text-slate-500 bg-slate-50 px-2 py-0.5 rounded break-all">
+                          <span className="text-muted">Prev:</span>
+                          <code className="font-mono text-muted bg-canvas px-2 py-0.5 rounded break-all">
                             {event.previous_hash || 'Genesis'}
                           </code>
                         </div>
                       </div>
                       <div className="shrink-0" title="Cryptographically verified">
-                        <Shield className="w-5 h-5 text-emerald-500" />
+                        <Shield className="w-5 h-5 text-success-500" />
                       </div>
                     </div>
                   </div>
@@ -1299,12 +1280,12 @@ export default function DisbursementsPage() {
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
-      <div className="w-full max-w-none mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container py-8">
         {/* Page Header & Primary Action Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-semibold text-ink tracking-tight">Disbursements &amp; Fund Releases</h1>
-            <p className="mt-1 text-sm text-ink/60">
+            <h1 className="text-3xl font-semibold text-ink tracking-tight">Disbursements & Fund Releases</h1>
+            <p className="mt-1 text-sm text-muted">
               Organisation: <span className="font-medium text-ink">LoveAll Foundation</span>
             </p>
           </div>
@@ -1313,7 +1294,7 @@ export default function DisbursementsPage() {
               type="button"
               onClick={() => { setProposeError(null); setIsProposeOpen(true); }}
               disabled={isSubmittingPropose}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-petrol rounded-lg hover:bg-petrol/90 focus:outline-none focus:ring-2 focus:ring-seafoam focus:ring-offset-2 disabled:opacity-50 transition-colors"
+              className="btn-primary"
             >
               <Plus className="w-4 h-4" />
               Propose Disbursement

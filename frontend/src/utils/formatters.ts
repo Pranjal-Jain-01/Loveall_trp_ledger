@@ -77,7 +77,7 @@ export function formatShortDate(dateString: string): string {
 }
 
 /**
- * Get status badge color classes
+ * Get status badge color classes using design system
  */
 export function getStatusBadgeClass(status: string): string {
   const base = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium';
@@ -85,38 +85,38 @@ export function getStatusBadgeClass(status: string): string {
   switch (status) {
     case 'DRAFT':
     case 'PROPOSED':
-      return `${base} bg-gray-100 text-gray-700 border border-gray-200`;
+      return `${base} bg-neutral-100 text-neutral-700 border border-neutral-200`;
     case 'PENDING_APPROVAL':
-      return `${base} bg-amber-50 text-amber-800 border border-amber-200`;
+      return `${base} bg-warning-50 text-warning-700 border border-warning-100`;
     case 'APPROVED':
-      return `${base} bg-emerald-50 text-emerald-800 border border-emerald-200`;
+      return `${base} bg-success-50 text-success-700 border border-success-100`;
     case 'PAID':
     case 'DISBURSED':
-      return `${base} bg-mist/30 text-petrol border border-mist`;
+      return `${base} bg-brand-100 text-brand-700 border border-brand-200`;
     case 'REJECTED':
-      return `${base} bg-red-50 text-red-800 border border-red-200`;
+      return `${base} bg-error-50 text-error-700 border border-error-100`;
     case 'CANCELLED':
-      return `${base} bg-slate-100 text-slate-700 border border-slate-200`;
+      return `${base} bg-neutral-100 text-neutral-700 border border-neutral-200`;
     default:
-      return `${base} bg-gray-100 text-gray-700 border border-gray-200`;
+      return `${base} bg-neutral-100 text-neutral-700 border border-neutral-200`;
   }
 }
 
 /**
- * Get source origin badge class
+ * Get source origin badge class using design system
  */
 export function getSourceOriginClass(origin: 'DOMESTIC' | 'FOREIGN'): string {
   if (origin === 'DOMESTIC') {
-    return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide bg-mist/35 text-ink border border-mist';
+    return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide bg-brand-100 text-brand-700 border border-brand-200';
   }
-  return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide bg-seafoam/20 text-petrol border border-seafoam';
+  return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold tracking-wide bg-brand-50 text-brand-700 border border-brand-100';
 }
 
 /**
- * Get recipient kind badge class
+ * Get recipient kind badge class using design system
  */
 export function getRecipientKindClass(_kind: string): string {
-  return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-mist/20 text-ink border border-hairline';
+  return 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-secondary border border-neutral-200';
 }
 
 /**
