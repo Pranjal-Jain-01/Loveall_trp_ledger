@@ -94,6 +94,9 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
       { label: 'Fund Pools', href: '/staff/fund-pools', icon: Calculator },
     ],
     secondaryActions: [
+      { label: 'Programmes', href: '/staff/programmes', icon: BarChart2 },
+      { label: 'Agreements', href: '/staff/agreements', icon: FileText },
+      { label: 'Compliance Logs', href: '/staff/compliance', icon: Lock },
       { label: 'Reconciliation', href: '/staff/reconciliation', icon: Search },
       { label: 'Reports', href: '/staff/reports', icon: BarChart2 },
       { label: 'Ledger Events', href: '/staff/ledger', icon: FileText },
@@ -123,9 +126,10 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
       { label: 'Submit Evidence', href: '/staff/evidence', icon: FileText },
     ],
     secondaryActions: [
+      { label: 'Agreements', href: '/staff/agreements', icon: FileText },
       { label: 'Disbursements', href: '/staff/disbursements', icon: FileText },
       { label: 'Beneficiaries', href: '/staff/beneficiaries', icon: Users },
-      { label: 'Compliance Notes', href: '/staff/compliance', icon: Lock },
+      { label: 'Compliance Logs', href: '/staff/compliance', icon: Lock },
     ],
     complianceNotes: [
       'Read-only access to disbursement data for assigned programmes',
@@ -152,8 +156,10 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
       { label: 'Programmes', href: '/staff/programmes', icon: BarChart2 },
     ],
     secondaryActions: [
+      { label: 'Agreements', href: '/staff/agreements', icon: FileText },
       { label: 'Conditional Releases', href: '/staff/conditional-releases', icon: Lock },
       { label: 'Disbursements', href: '/staff/disbursements', icon: FileText },
+      { label: 'Compliance Logs', href: '/staff/compliance', icon: Lock },
       { label: 'Team Overview', href: '/staff/team', icon: Users },
     ],
     complianceNotes: [
@@ -181,9 +187,11 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
       { label: 'Verifications', href: '/staff/verifications', icon: CheckCircle },
     ],
     secondaryActions: [
+      { label: 'Programmes', href: '/staff/programmes', icon: BarChart2 },
       { label: 'Conditional Releases', href: '/staff/conditional-releases', icon: Lock },
       { label: 'Audit Trail', href: '/staff/ledger', icon: FileText },
       { label: 'Certificates', href: '/staff/certificates', icon: FileText },
+      { label: 'Compliance Logs', href: '/staff/compliance', icon: Lock },
     ],
     complianceNotes: [
       'Read-only access to disbursements & ledger',
@@ -210,6 +218,9 @@ export const ROLE_CONFIGS: Record<UserRole, RoleConfig> = {
       { label: 'Compliance Logs', href: '/staff/compliance', icon: Lock },
     ],
     secondaryActions: [
+      { label: 'Programmes', href: '/staff/programmes', icon: BarChart2 },
+      { label: 'Agreements', href: '/staff/agreements', icon: FileText },
+      { label: 'Staff Management', href: '/staff/users', icon: Users },
       { label: 'Disbursements', href: '/staff/disbursements', icon: FileText },
       { label: 'Fund Pools', href: '/staff/fund-pools', icon: Calculator },
       { label: 'Export Audit Pack', href: '/staff/audit/export', icon: FileText },
